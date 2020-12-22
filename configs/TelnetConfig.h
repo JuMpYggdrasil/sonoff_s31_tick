@@ -25,6 +25,12 @@
             loop: is a function name, that executed this debug
             C1: is a core that executed this debug (and a function of this) (only for ESP32)
             The remai ning is the message formatted (printf)
+			
+	%c  = character
+	%d  = integer, byte
+	%u  = unsigned integer
+	%ld = long
+	%lu = unsigned long
 */
 
 #endif

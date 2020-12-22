@@ -132,6 +132,7 @@ void setup() {
     btnTicker.attach(0.02, btnTick);
     ledTicker.attach(0.05, ledTick);
 
+
 #if USE_REDIS
     redis_deviceKey.reserve(80);
     redis_server_addr.reserve(30);
@@ -147,10 +148,10 @@ void setup() {
         delay(1);
 
 #if USE_REDIS
-        EEPROM_WriteString(REDIS_EEPROM_ADDR_BEGIN, REDIS_DEVKEY);
-        EEPROM_WriteString(REDIS_EEPROM_SERVER_ADDR, REDIS_ADDR);
-        EEPROM_WriteUInt(REDIS_EEPROM_SERVER_PORT, REDIS_PORT);
-        EEPROM_WriteString(REDIS_EEPROM_SERVER_PASS, REDIS_PASS);
+        //        EEPROM_WriteString(REDIS_EEPROM_ADDR_BEGIN, REDIS_DEVKEY);
+        //        EEPROM_WriteString(REDIS_EEPROM_SERVER_ADDR, REDIS_ADDR);
+        //        EEPROM_WriteUInt(REDIS_EEPROM_SERVER_PORT, REDIS_PORT);
+        //        EEPROM_WriteString(REDIS_EEPROM_SERVER_PASS, REDIS_PASS);
 #endif
     }
 
@@ -161,15 +162,15 @@ void setup() {
     if (singleClick_flag) {
         //restore to default
 #if USE_REDIS
-        EEPROM_WriteString(REDIS_EEPROM_ADDR_BEGIN, REDIS_DEVKEY);
-        EEPROM_WriteString(REDIS_EEPROM_SERVER_ADDR, REDIS_ADDR);
-        EEPROM_WriteUInt(REDIS_EEPROM_SERVER_PORT, REDIS_PORT);
-        EEPROM_WriteString(REDIS_EEPROM_SERVER_PASS, REDIS_PASS);
-
-        redis_deviceKey = EEPROM_ReadString(REDIS_EEPROM_ADDR_BEGIN);
-        redis_server_addr = EEPROM_ReadString(REDIS_EEPROM_SERVER_ADDR);
-        redis_server_port = EEPROM_ReadUInt(REDIS_EEPROM_SERVER_PORT);
-        redis_server_pass = EEPROM_ReadString(REDIS_EEPROM_SERVER_PASS);
+        //        EEPROM_WriteString(REDIS_EEPROM_ADDR_BEGIN, REDIS_DEVKEY);
+        //        EEPROM_WriteString(REDIS_EEPROM_SERVER_ADDR, REDIS_ADDR);
+        //        EEPROM_WriteUInt(REDIS_EEPROM_SERVER_PORT, REDIS_PORT);
+        //        EEPROM_WriteString(REDIS_EEPROM_SERVER_PASS, REDIS_PASS);
+        //
+        //        redis_deviceKey = EEPROM_ReadString(REDIS_EEPROM_ADDR_BEGIN);
+        //        redis_server_addr = EEPROM_ReadString(REDIS_EEPROM_SERVER_ADDR);
+        //        redis_server_port = EEPROM_ReadUInt(REDIS_EEPROM_SERVER_PORT);
+        //        redis_server_pass = EEPROM_ReadString(REDIS_EEPROM_SERVER_PASS);
 #endif
 
 #if USE_WiFiManager
@@ -325,7 +326,7 @@ void setup() {
 #endif
 
     server.begin();
-    
+
 #if USE_NTP
     timeClient.begin();
 #endif
@@ -358,19 +359,19 @@ void setup() {
 #endif
 
 #if USE_REDIS
-    redis_deviceKey = EEPROM_ReadString(REDIS_EEPROM_ADDR_BEGIN);
-    redis_server_addr = EEPROM_ReadString(REDIS_EEPROM_SERVER_ADDR);
-    redis_server_port = EEPROM_ReadUInt(REDIS_EEPROM_SERVER_PORT);
-    redis_server_pass = EEPROM_ReadString(REDIS_EEPROM_SERVER_PASS);
+    //    redis_deviceKey = EEPROM_ReadString(REDIS_EEPROM_ADDR_BEGIN);
+    //    redis_server_addr = EEPROM_ReadString(REDIS_EEPROM_SERVER_ADDR);
+    //    redis_server_port = EEPROM_ReadUInt(REDIS_EEPROM_SERVER_PORT);
+    //    redis_server_pass = EEPROM_ReadString(REDIS_EEPROM_SERVER_PASS);
 #endif
 
 #if USE_TELNET
     debugI("IP address: %s", WiFi.localIP().toString().c_str());
 #if USE_REDIS
-    debugI("redis_deviceKey: %s", redis_deviceKey.c_str());
-    debugI("redis_server_addr: %s", redis_server_addr.c_str());
-    debugI("redis_server_port: %d", redis_server_port);
-    debugI("redis_server_pass: %s", redis_server_pass.c_str());
+    //    debugI("redis_deviceKey: %s", redis_deviceKey.c_str());
+    //    debugI("redis_server_addr: %s", redis_server_addr.c_str());
+    //    debugI("redis_server_port: %d", redis_server_port);
+    //    debugI("redis_server_pass: %s", redis_server_pass.c_str());
 #endif
 
 #endif
@@ -393,7 +394,7 @@ void setup() {
 
 // ## Loop Section
 unsigned long checkTime1, checkTime2, checkTime3, checkTime4, checkTime5, checkTime6, checkTime7, checkTime8, checkTime9;
-unsigned long checkDiffTime1, checkDiffTime2, checkDiffTime3, checkDiffTime4, checkDiffTime5, checkDiffTime6, checkDiffTime7,checkDiffTime8, checkDiffTime9;
+unsigned long checkDiffTime1, checkDiffTime2, checkDiffTime3, checkDiffTime4, checkDiffTime5, checkDiffTime6, checkDiffTime7, checkDiffTime8, checkDiffTime9;
 
 void loop()
 {
@@ -409,22 +410,25 @@ void loop()
         }
 
 #if USE_REDIS
-        if (mTimeSeconds % redisPeriod == 1) {
+        if (mTimeSeconds % redisPeriod == 0) {
             redisInterface_flag = true;
         }
 #endif
 
 #if !USE_NTP
-        if (mTimeSeconds % 60 == 2) { // Each minute
+        if (mTimeSeconds % 60 == 0) { // Each minute
             configTime(timezone, dst, "pool.ntp.org", "time.nist.gov");
             //need some time delay slot****
         }
 
         checkTime6 = millis();
-        time_t now = time(nullptr);
-        struct tm* p_tm = localtime(&now);
-        debugD("t: %s", asctime (p_tm));//human readable
-        debugD("epoch: %ld", now);//epoch:unix timestamp
+        time_t now = time(nullptr);//now type is long,%ld
+        char nowCString[20];
+        sprintf(nowCString, "the current value is %ld", now);
+        debugV("epoch: %s", nowCString);//epoch:unix timestamp
+        // struct tm* p_tm = localtime(&now);
+        // debugD("t: %s", asctime (p_tm));//human readable
+
         checkDiffTime6 = millis() - checkTime6;
 #endif
 
@@ -457,7 +461,7 @@ void loop()
 #endif
 
 #if USE_REDIS
-checkTime7 = millis();
+    checkTime7 = millis();
     redisInterface_handle();
     checkDiffTime7 = millis() - checkTime7;
 #endif
@@ -496,7 +500,7 @@ checkTime7 = millis();
         debugW("FTP: %lu", checkDiffTime4);
     }
     if (checkDiffTime5 >= 10) {
-        debugW("handleClient: %lu", checkDiffTime5);
+        debugV("handleClient: %lu", checkDiffTime5);
     }
     if (checkDiffTime6 >= 10) {
         debugW("NTP: %lu", checkDiffTime6);
@@ -525,10 +529,10 @@ void clickbutton_action(void) {
             debugI("status off\n");
         }
 #if USE_REDIS
-        debugI("redis_deviceKey: %s", redis_deviceKey.c_str());
-        debugI("redis_server_addr: %s", redis_server_addr.c_str());
-        debugI("redis_server_port: %d", redis_server_port);
-        debugI("redis_server_pass: %s", redis_server_pass.c_str());
+        //        debugI("redis_deviceKey: %s", redis_deviceKey.c_str());
+        //        debugI("redis_server_addr: %s", redis_server_addr.c_str());
+        //        debugI("redis_server_port: %d", redis_server_port);
+        //        debugI("redis_server_pass: %s", redis_server_pass.c_str());
         //debugI("cse7766: %s", cse7766.description().c_str());
 #endif
         debugW("ssid %s", WiFi.SSID().c_str());
@@ -676,246 +680,6 @@ void startupLog(void) {
     //    }
     //    logFile.close();
 }
-#if USE_REDIS
-void redisInterface_handle(void) {
-    String redis_key;
-    String cse7766_value;
-    String redis_str_result;
-    bool redis_bool_result;
-
-    if (redisInterface_flag == true) {
-        if (redisInterface_state == 0) {//WIFI CLIENT
-            if (!redisConn.connect(redis_server_addr.c_str(), redis_server_port))
-            {
-#if USE_TELNET
-                debugE("Failed to connect to the Redis server!");
-#endif
-                redisInterface_state = 0;
-                redisInterface_flag = false;
-                redisPeriod = REDIS_PERIOD_FAIL;
-                blueLed.setPatternSingle(error_pattern, 6);
-                return;
-            }
-            redisPeriod = REDIS_PERIOD_NORM;
-            redisInterface_state++;
-        } else if (redisInterface_state == 1) {
-            Redis redis(redisConn);
-            if (redis_server_pass != "") {
-                auto connRet = redis.authenticate(redis_server_pass.c_str());
-
-                if (connRet == RedisSuccess)
-                {
-#if USE_TELNET
-                    debugD("Connected to the Redis server!");
-#endif
-                    blueLed.setPatternSingle(normal_pattern, 4);
-                } else {
-#if USE_TELNET
-                    debugE("Failed to authenticate to the Redis server! Errno: %d\n", (int)connRet);
-#endif
-                    redisInterface_state = 0;
-                    redisInterface_flag = false;
-                    redisConn.stop();
-                    blueLed.setPatternSingle(unAuthen_pattern, 6);
-                    return;
-                }
-            } else {
-                blueLed.setPatternSingle(noAuthen_pattern, 8);
-            }
-
-            // Voltage
-            redis_key = redis_deviceKey + String(redis_voltage);
-            cse7766_value = String(cse7766.getVoltage());
-#if USE_TELNET
-            debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
-#endif
-            redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
-            if (redis_bool_result) {
-                debugD("ok!");
-            } else {
-                debugE("err");
-                if (redis_server_pass == "") {//can connect but auth fail
-                    blueLed.setPatternSingle(unAuthen_pattern, 6);
-                }
-            }
-#if REDIS_GET_TEST
-            redis_str_result = redis.get(redis_key.c_str());
-            debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
-#endif
-#endif
-
-            // Current
-            redis_key = redis_deviceKey + String(redis_current);
-            cse7766_value = String(cse7766.getCurrent());
-#if USE_TELNET
-            debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
-#endif
-            redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
-            if (redis_bool_result) {
-                debugD("ok!");
-            } else {
-                debugE("err");
-            }
-#if REDIS_GET_TEST
-            redis_str_result = redis.get(redis_key.c_str());
-            debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
-#endif
-#endif
-
-            // ActivePower
-            redis_key = redis_deviceKey + String(redis_activepower);
-            cse7766_value = String(cse7766.getActivePower());
-#if USE_TELNET
-            debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
-#endif
-            redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
-            if (redis_bool_result) {
-                debugD("ok!");
-            } else {
-                debugE("err");
-            }
-#if REDIS_GET_TEST
-            redis_str_result = redis.get(redis_key.c_str());
-            debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
-#endif
-#endif
-
-            // ApparentPower
-            redis_key = redis_deviceKey + String(redis_apparentpower);
-            cse7766_value = String(cse7766.getApparentPower());
-#if USE_TELNET
-            debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
-#endif
-            redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
-            if (redis_bool_result) {
-                debugD("ok!");
-            } else {
-                debugE("err");
-            }
-#if REDIS_GET_TEST
-            redis_str_result = redis.get(redis_key.c_str());
-            debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
-#endif
-#endif
-
-            redisInterface_state++;
-        } else if (redisInterface_state == 2) {
-            Redis redis(redisConn);
-            if (redis_server_pass != "") {
-                auto connRet = redis.authenticate(redis_server_pass.c_str());
-
-                if (connRet == RedisSuccess)
-                {
-#if USE_TELNET
-                    debugD("Connected to the Redis server!");
-#endif
-                } else {
-#if USE_TELNET
-                    debugE("Failed to authenticate to the Redis server! Errno: %d\n", (int)connRet);
-#endif
-                    redisInterface_state = 0;
-                    redisInterface_flag = false;
-                    redisConn.stop();
-                    return;
-                }
-            }
-
-            // ReactivePower
-            redis_key = redis_deviceKey + String(redis_reactivepower);
-            cse7766_value = String(cse7766.getReactivePower());
-#if USE_TELNET
-            debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
-#endif
-            redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
-            if (redis_bool_result) {
-                debugD("ok!");
-            } else {
-                debugE("err");
-            }
-#if REDIS_GET_TEST
-            redis_str_result = redis.get(redis_key.c_str());
-            debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
-#endif
-#endif
-
-            // PowerFactor
-            redis_key = redis_deviceKey + String(redis_powerfactor);
-            cse7766_value = String(cse7766.getPowerFactor());
-#if USE_TELNET
-            debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
-#endif
-            redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
-            if (redis_bool_result) {
-                debugD("ok!");
-            } else {
-                debugE("err");
-            }
-#if REDIS_GET_TEST
-            redis_str_result = redis.get(redis_key.c_str());
-            debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
-#endif
-#endif
-
-            // Energy
-            redis_key = redis_deviceKey + String(redis_energy);
-            cse7766_value = String(cse7766.getEnergy());
-#if USE_TELNET
-            debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
-#endif
-            redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
-            if (redis_bool_result) {
-                debugD("ok!");
-            } else {
-                debugE("err");
-            }
-#if REDIS_GET_TEST
-            redis_str_result = redis.get(redis_key.c_str());
-            debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
-#endif
-#endif
-
-            // TimeStamp
-            redis_key = redis_deviceKey + String(redis_timestamp);
-            //            String timeStamp = timeClient.getFormattedTime();
-#if USE_TELNET
-            //            debugD("SET %s %s: ", redis_key.c_str(), timeStamp.c_str());
-#endif
-            //            redis_bool_result = redis.set(redis_key.c_str(), timeStamp.c_str());
-#if USE_TELNET
-            if (redis_bool_result) {
-                debugD("ok!");
-            } else {
-                debugE("err");
-            }
-#if REDIS_GET_TEST
-            redis_str_result = redis.get(redis_key.c_str());
-            debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
-#endif
-#endif
-
-            redisInterface_state++;
-        } else if (redisInterface_state == 3) {
-            redisConn.stop();
-#if USE_TELNET
-            debugD("Connection closed!");
-#endif
-
-            redisInterface_state = 0;
-            redisInterface_flag = false;
-        } else {
-            redisInterface_state = 0;
-            redisInterface_flag = false;
-        }
-    }
-}
-#endif
 
 #if USE_WiFiManager
 void configModeCallback (WiFiManager *myWiFiManager) {//start AP mode

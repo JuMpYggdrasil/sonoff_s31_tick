@@ -7,7 +7,8 @@
 #define USE_OTA true//keep true, if possible.
 #define USE_TELNET true
 #define USE_REDIS true
-#define REDIS_GET_TEST false
+#define REDIS_SET_TEST true
+#define REDIS_GET_TEST true
 #define USE_NTP false
 
 #define DEVICE_NAME "s31_1"
