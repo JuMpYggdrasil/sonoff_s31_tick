@@ -40,6 +40,7 @@ IPAddress primaryDNS(192, 168, 1, 1);
 
 #if USE_FTP
 FtpServer ftpSrv;
+File fsUploadFile;
 #endif
 
 #if USE_TELNET
@@ -148,10 +149,10 @@ void setup() {
         delay(1);
 
 #if USE_REDIS
-        //        EEPROM_WriteString(REDIS_EEPROM_ADDR_BEGIN, REDIS_DEVKEY);
-        //        EEPROM_WriteString(REDIS_EEPROM_SERVER_ADDR, REDIS_ADDR);
-        //        EEPROM_WriteUInt(REDIS_EEPROM_SERVER_PORT, REDIS_PORT);
-        //        EEPROM_WriteString(REDIS_EEPROM_SERVER_PASS, REDIS_PASS);
+        EEPROM_WriteString(REDIS_EEPROM_ADDR_BEGIN, REDIS_DEVKEY);
+        EEPROM_WriteString(REDIS_EEPROM_SERVER_ADDR, REDIS_ADDR);
+        EEPROM_WriteUInt(REDIS_EEPROM_SERVER_PORT, REDIS_PORT);
+        EEPROM_WriteString(REDIS_EEPROM_SERVER_PASS, REDIS_PASS);
 #endif
     }
 
@@ -221,8 +222,9 @@ void setup() {
     if (!res) {
         blueLed.setOnSingle();//turn off blue led
         delay(3000);
-        ESP.reset();
-        delay(5000);
+        //ESP.reset();
+        ESP.restart();//more clean
+
     }
 #else
     WiFi.begin(ssid, password);
@@ -260,16 +262,16 @@ void setup() {
 #endif
 
     MDNS.addService("http", "tcp", 80);
-
-
 #endif //USE_MDNS
+
+    bool spiffsResult = SPIFFS.begin();
 
     // #### webpage assign section
     // ##### client web access
     server.on("/", HTTP_GET, handleRoot);
     server.on("/info", HTTP_GET, handleInfo);
     server.on("/graph", HTTP_GET, handleGraph);
-    server.onNotFound(handleNotFound);
+
     // ##### spiffs file support
     server.serveStatic("/style.css", SPIFFS, "/style.css");
     server.serveStatic("/log.txt", SPIFFS, "/log.txt");
@@ -318,7 +320,12 @@ void setup() {
         xValue.concat(ssni);
         server.send(200, "text/plain", xValue);//(comma format)
     });
-
+    // ##### file upload
+        server.on("/upload", HTTP_POST, []() {
+            server.send(200, "text/plain", "upload ok");
+        }, handleFileUpload);
+    // ##### file not found
+    server.onNotFound(handleNotFound);
 
 
 #if USE_OTA
@@ -329,18 +336,24 @@ void setup() {
 
 #if USE_NTP
     timeClient.begin();
+#else
+    configTime(timezone, dst, "pool.ntp.org", "time.nist.gov");
+    while (!time(nullptr)) {
+        delay(1000);
+    }
 #endif
 
-    bool spiffsResult = SPIFFS.begin();
-    if (spiffsResult) {
+    //if server already begin then
+    if (spiffsResult) {//if there is file system
 #if USE_FTP
         // FTP Setup, ensure SPIFFS is started before ftp;
         ftpSrv.begin(ftp_username, ftp_password);// Then start FTP server when WiFi connection in On
+
+        startupConfig();
+        startupLog();
+    }
 #endif
 
-        //startupConfig();
-        //startupLog();
-    }
 
 #if USE_TELNET
     // Initialize RemoteDebug
@@ -359,21 +372,20 @@ void setup() {
 #endif
 
 #if USE_REDIS
-    //    redis_deviceKey = EEPROM_ReadString(REDIS_EEPROM_ADDR_BEGIN);
-    //    redis_server_addr = EEPROM_ReadString(REDIS_EEPROM_SERVER_ADDR);
-    //    redis_server_port = EEPROM_ReadUInt(REDIS_EEPROM_SERVER_PORT);
-    //    redis_server_pass = EEPROM_ReadString(REDIS_EEPROM_SERVER_PASS);
+    redis_deviceKey = EEPROM_ReadString(REDIS_EEPROM_ADDR_BEGIN);
+    redis_server_addr = EEPROM_ReadString(REDIS_EEPROM_SERVER_ADDR);
+    redis_server_port = EEPROM_ReadUInt(REDIS_EEPROM_SERVER_PORT);
+    redis_server_pass = EEPROM_ReadString(REDIS_EEPROM_SERVER_PASS);
 #endif
 
 #if USE_TELNET
     debugI("IP address: %s", WiFi.localIP().toString().c_str());
 #if USE_REDIS
-    //    debugI("redis_deviceKey: %s", redis_deviceKey.c_str());
-    //    debugI("redis_server_addr: %s", redis_server_addr.c_str());
-    //    debugI("redis_server_port: %d", redis_server_port);
-    //    debugI("redis_server_pass: %s", redis_server_pass.c_str());
+    debugI("redis_deviceKey: %s", redis_deviceKey.c_str());
+    debugI("redis_server_addr: %s", redis_server_addr.c_str());
+    debugI("redis_server_port: %d", redis_server_port);
+    debugI("redis_server_pass: %s", redis_server_pass.c_str());
 #endif
-
 #endif
 
     blueLed.setOnSingle();//turn off blue led
@@ -382,13 +394,6 @@ void setup() {
     // ### Device inital complete
     blueLed.setPatternSingle(initPass_pattern, 2);//one short blink
     ESP.wdtEnable(WDTO_8S);
-
-#if !USE_NTP
-    configTime(timezone, dst, "pool.ntp.org", "time.nist.gov");
-    while (!time(nullptr)) {
-        delay(1000);
-    }
-#endif
 }
 
 
@@ -405,8 +410,8 @@ void loop()
         mLastTime = millis();
         mTimeSeconds++;
 
-        if (mTimeSeconds % 5 == 0) { // Each 5 seconds
-            //PowerSensorDisplay();
+        if (mTimeSeconds % 10 == 0) { // Each 5 seconds
+            PowerSensorDisplay();
         }
 
 #if USE_REDIS
@@ -421,15 +426,17 @@ void loop()
             //need some time delay slot****
         }
 
-        checkTime6 = millis();
-        time_t now = time(nullptr);//now type is long,%ld
-        char nowCString[20];
-        sprintf(nowCString, "the current value is %ld", now);
-        debugV("epoch: %s", nowCString);//epoch:unix timestamp
-        // struct tm* p_tm = localtime(&now);
-        // debugD("t: %s", asctime (p_tm));//human readable
+        if (mTimeSeconds % 6 == 0) { // Each 6 sec
+            checkTime6 = millis();
+            time_t now = time(nullptr);//now type is long,%ld
+            char nowCString[20];
+            sprintf(nowCString, "%ld", now);
+            debugV("epoch: %s", nowCString);//epoch:unix timestamp
+            // struct tm* p_tm = localtime(&now);
+            // debugD("t: %s", asctime (p_tm));//human readable
 
-        checkDiffTime6 = millis() - checkTime6;
+            checkDiffTime6 = millis() - checkTime6;
+        }
 #endif
 
     }
@@ -462,7 +469,7 @@ void loop()
 
 #if USE_REDIS
     checkTime7 = millis();
-    redisInterface_handle();
+    //redisInterface_handle();
     checkDiffTime7 = millis() - checkTime7;
 #endif
 
@@ -471,9 +478,6 @@ void loop()
     MDNS.update();
     checkDiffTime8 = millis() - checkTime8;
 #endif
-
-
-
 
 #if USE_TELNET
     checkTime9 = millis();
@@ -514,12 +518,11 @@ void loop()
     if (checkDiffTime9 >= 10) {
         debugW("TELNET: %lu", checkDiffTime9);
     }
-
 }
 
 // # Member Function Definition Section
 void clickbutton_action(void) {
-    if ( singleClick_flag) {
+    if (singleClick_flag) {
 
 #if USE_TELNET
         debugD("SingleClick");
@@ -593,7 +596,7 @@ void clickbutton_action(void) {
 
         singleClick_flag = false;
     }
-    if ( doubleClick_flag) {
+    if (doubleClick_flag) {
         digitalWrite(RELAY_PIN, !digitalRead(RELAY_PIN));
 #if USE_TELNET
         debugD("DoubleClick");
@@ -623,6 +626,22 @@ void clickbutton_action(void) {
     //        ESP.restart();
     //#endif
     //    }
+
+
+    if (longClick_flag) {
+
+#if USE_TELNET
+        debugD("LongClick");
+#endif
+
+
+        blueLed.setOnSingle();//turn off blue led
+        delay(3000);
+        //ESP.reset();
+        ESP.restart();//more clean
+
+        longClick_flag = false;
+    }
 }
 void PowerSensorDisplay(void) {
 #if USE_TELNET

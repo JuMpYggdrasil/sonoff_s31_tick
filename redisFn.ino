@@ -47,12 +47,12 @@ void redisInterface_handle(void) {
             // Voltage
             redis_key = redis_deviceKey + String(redis_voltage);
             cse7766_value = String(cse7766.getVoltage());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
 #endif
 #if REDIS_SET_TEST
             redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             if (redis_bool_result) {
                 debugD("ok!");
             } else {
@@ -65,7 +65,7 @@ void redisInterface_handle(void) {
 #endif
 #if REDIS_GET_TEST
             redis_str_result = redis.get(redis_key.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
 #endif
 #endif
@@ -73,12 +73,12 @@ void redisInterface_handle(void) {
             // Current
             redis_key = redis_deviceKey + String(redis_current);
             cse7766_value = String(cse7766.getCurrent());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
 #endif
 #if REDIS_SET_TEST
             redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             if (redis_bool_result) {
                 debugD("ok!");
             } else {
@@ -88,7 +88,7 @@ void redisInterface_handle(void) {
 #endif
 #if REDIS_GET_TEST
             redis_str_result = redis.get(redis_key.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
 #endif
 #endif
@@ -96,12 +96,12 @@ void redisInterface_handle(void) {
             // ActivePower
             redis_key = redis_deviceKey + String(redis_activepower);
             cse7766_value = String(cse7766.getActivePower());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
 #endif
 #if REDIS_SET_TEST
             redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             if (redis_bool_result) {
                 debugD("ok!");
             } else {
@@ -111,7 +111,7 @@ void redisInterface_handle(void) {
 #endif
 #if REDIS_GET_TEST
             redis_str_result = redis.get(redis_key.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
 #endif
 #endif
@@ -119,12 +119,12 @@ void redisInterface_handle(void) {
             // ApparentPower
             redis_key = redis_deviceKey + String(redis_apparentpower);
             cse7766_value = String(cse7766.getApparentPower());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
 #endif
 #if REDIS_SET_TEST
             redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             if (redis_bool_result) {
                 debugD("ok!");
             } else {
@@ -134,7 +134,7 @@ void redisInterface_handle(void) {
 #endif
 #if REDIS_GET_TEST
             redis_str_result = redis.get(redis_key.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
 #endif
 #endif
@@ -164,12 +164,12 @@ void redisInterface_handle(void) {
             // ReactivePower
             redis_key = redis_deviceKey + String(redis_reactivepower);
             cse7766_value = String(cse7766.getReactivePower());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
 #endif
 #if REDIS_SET_TEST
             redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             if (redis_bool_result) {
                 debugD("ok!");
             } else {
@@ -179,7 +179,7 @@ void redisInterface_handle(void) {
 #endif
 #if REDIS_GET_TEST
             redis_str_result = redis.get(redis_key.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
 #endif
 #endif
@@ -187,12 +187,12 @@ void redisInterface_handle(void) {
             // PowerFactor
             redis_key = redis_deviceKey + String(redis_powerfactor);
             cse7766_value = String(cse7766.getPowerFactor());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
 #endif
 #if REDIS_SET_TEST
             redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             if (redis_bool_result) {
                 debugD("ok!");
             } else {
@@ -202,7 +202,7 @@ void redisInterface_handle(void) {
 #endif
 #if REDIS_GET_TEST
             redis_str_result = redis.get(redis_key.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
 #endif
 #endif
@@ -210,12 +210,12 @@ void redisInterface_handle(void) {
             // Energy
             redis_key = redis_deviceKey + String(redis_energy);
             cse7766_value = String(cse7766.getEnergy());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("SET %s %s: ", redis_key.c_str(), cse7766_value.c_str());
 #endif
 #if REDIS_SET_TEST
             redis_bool_result = redis.set(redis_key.c_str(), cse7766_value.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             if (redis_bool_result) {
                 debugD("ok!");
             } else {
@@ -225,7 +225,7 @@ void redisInterface_handle(void) {
 #endif
 #if REDIS_GET_TEST
             redis_str_result = redis.get(redis_key.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
 #endif
 #endif
@@ -233,12 +233,12 @@ void redisInterface_handle(void) {
             // TimeStamp
             redis_key = redis_deviceKey + String(redis_timestamp);
             //            String timeStamp = timeClient.getFormattedTime();
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             //            debugD("SET %s %s: ", redis_key.c_str(), timeStamp.c_str());
 #endif
 #if REDIS_SET_TEST
             //            redis_bool_result = redis.set(redis_key.c_str(), timeStamp.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             if (redis_bool_result) {
                 debugD("ok!");
             } else {
@@ -248,7 +248,7 @@ void redisInterface_handle(void) {
 #endif
 #if REDIS_GET_TEST
             redis_str_result = redis.get(redis_key.c_str());
-#if USE_TELNET
+#if USE_TELNET && REDIS_MINOR_DEBUG
             debugD("GET %s: %s", redis_key.c_str(), redis_str_result.c_str());
 #endif
 #endif

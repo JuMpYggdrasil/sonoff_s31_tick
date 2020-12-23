@@ -97,6 +97,11 @@ void handleInfo(void) {
         infoPage.concat("<div>" + String(dir.fileName ()) + "," + dir.fileSize () + "</div>");
     }
 
+    infoPage.concat(F("<form action='/upload' method='post' enctype='multipart/form-data'>"));
+    infoPage.concat(F("<input type='file' name='uploadBtn'>"));
+    infoPage.concat(F("<input class='button' type='submit'>"));
+    infoPage.concat(F("</form>"));
+
     infoPage.concat(FPSTR(WEB_SCRIPT_START));
     infoPage.concat("setInterval(function xmlDataRequest(){");
     infoPage.concat("var xhttp = new XMLHttpRequest();");
@@ -186,6 +191,41 @@ void handleGraph(void) {
     // Info web page
     server.send(200, "text/html", graphPage);
 }
+
+void handleFileUpload() {
+    //if (server.uri() != "/info") return;
+    
+    HTTPUpload& upload = server.upload();
+    if (upload.status == UPLOAD_FILE_START) {
+        String filename = upload.filename;
+        if (!filename.startsWith("/")) filename = "/" + filename;
+        //DBG_OUTPUT_PORT.print("handleFileUpload Name: "); DBG_OUTPUT_PORT.println(filename);
+        fsUploadFile = SPIFFS.open(filename, "w");
+        filename = String();
+    } else if (upload.status == UPLOAD_FILE_WRITE) {
+        //DBG_OUTPUT_PORT.print("handleFileUpload Data: "); DBG_OUTPUT_PORT.println(upload.currentSize);
+        if (fsUploadFile)
+            fsUploadFile.write(upload.buf, upload.currentSize);
+    } else if (upload.status == UPLOAD_FILE_END) {
+        if (fsUploadFile)
+            fsUploadFile.close();
+        //DBG_OUTPUT_PORT.print("handleFileUpload Size: "); DBG_OUTPUT_PORT.println(upload.totalSize);
+    }
+
+    String uploadPage = "";
+    uploadPage.concat(FPSTR(WEB_HEAD));
+    uploadPage.concat(FPSTR(WEB_STYLE));
+    uploadPage.concat(FPSTR(WEB_BODY_START));
+    uploadPage.concat(FPSTR(WEB_SIDENAV));
+    uploadPage.concat(FPSTR(WEB_CONTENT_START));
+
+    uploadPage.concat(F("<div>file upload ok</div>"));
+    uploadPage.concat(FPSTR(WEB_BODY_HTML_END));
+    
+    server.send(200, "text/html", uploadPage);
+    
+}
+
 void handleNotFound() {
     server.send(404, "text / plain", "404: Not found");// Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
 }

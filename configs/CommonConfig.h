@@ -9,6 +9,7 @@
 #define USE_REDIS true
 #define REDIS_SET_TEST true
 #define REDIS_GET_TEST true
+#define REDIS_MINOR_DEBUG false
 #define USE_NTP false
 
 #define DEVICE_NAME "s31_1"
