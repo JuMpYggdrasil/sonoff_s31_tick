@@ -222,9 +222,9 @@ void setup() {
     if (!res) {
         blueLed.setOnSingle();//turn off blue led
         delay(3000);
-        //ESP.reset();
-        ESP.restart();//more clean
-
+        ESP.reset();
+        //ESP.restart();//more clean
+        delay(5000);
     }
 #else
     WiFi.begin(ssid, password);
@@ -321,9 +321,9 @@ void setup() {
         server.send(200, "text/plain", xValue);//(comma format)
     });
     // ##### file upload
-        server.on("/upload", HTTP_POST, []() {
-            server.send(200, "text/plain", "upload ok");
-        }, handleFileUpload);
+    server.on("/upload", HTTP_POST, []() {
+        server.send(200, "text/plain", "upload ok");
+    }, handleFileUpload);
     // ##### file not found
     server.onNotFound(handleNotFound);
 
@@ -518,6 +518,7 @@ void loop()
     if (checkDiffTime9 >= 10) {
         debugW("TELNET: %lu", checkDiffTime9);
     }
+    
 }
 
 // # Member Function Definition Section
@@ -637,9 +638,9 @@ void clickbutton_action(void) {
 
         blueLed.setOnSingle();//turn off blue led
         delay(3000);
-        //ESP.reset();
-        ESP.restart();//more clean
-
+        ESP.reset();
+        //ESP.restart();//more clean
+        delay(5000);
         longClick_flag = false;
     }
 }
