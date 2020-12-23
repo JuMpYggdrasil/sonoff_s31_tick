@@ -504,7 +504,7 @@ void loop()
         debugW("FTP: %lu", checkDiffTime4);
     }
     if (checkDiffTime5 >= 10) {
-        debugV("handleClient: %lu", checkDiffTime5);
+        debugW("handleClient: %lu", checkDiffTime5);
     }
     if (checkDiffTime6 >= 10) {
         debugW("NTP: %lu", checkDiffTime6);
