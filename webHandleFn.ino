@@ -101,6 +101,7 @@ void handleInfo(void) {
     infoPage.concat(F("<input type='file' name='uploadBtn'>"));
     infoPage.concat(F("<input class='button' type='submit'>"));
     infoPage.concat(F("</form>"));
+    infoPage.concat(F("<div>*note: FTP supported</div>"));
 
     infoPage.concat(FPSTR(WEB_SCRIPT_START));
     infoPage.concat("setInterval(function xmlDataRequest(){");
